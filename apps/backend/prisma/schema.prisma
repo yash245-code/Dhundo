@@ -1,0 +1,175 @@
+// Dhundo — Prisma Schema (MySQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  EMPLOYEE
+  DEVELOPER
+  QA
+  ADMIN
+}
+
+enum BugSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum BugStatus {
+  OPEN
+  IN_PROGRESS
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum NotificationType {
+  ASSIGNED
+  COMMENTED
+  STATUS_CHANGED
+  MENTIONED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+/// Valid office IDs. Admin pre-seeds this table. Employees must have a matching
+/// record here to be able to register an account.
+model OfficeId {
+  id        String    @id @default(uuid())
+  officeId  String    @unique @map("office_id")
+  usedAt    DateTime? @map("used_at")
+  user      User?
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@map("office_ids")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  officeId     String    @unique @map("office_id")
+  email        String    @unique
+  role         UserRole  @default(EMPLOYEE)
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  officeIdRef      OfficeId       @relation(fields: [officeId], references: [officeId])
+  reportedBugs     Bug[]          @relation("BugReporter")
+  assignedBugs     Bug[]          @relation("BugAssignee")
+  comments         BugComment[]
+  notifications    Notification[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String   @db.Text
+  repoUrl     String?  @map("repo_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  bugs Bug[]
+
+  @@map("projects")
+}
+
+model Bug {
+  id                String      @id @default(uuid())
+  title             String
+  description       String      @db.Text
+  stepsToReproduce  String?     @map("steps_to_reproduce") @db.Text
+  severity          BugSeverity @default(MEDIUM)
+  status            BugStatus   @default(OPEN)
+  environment       String?     // e.g. "iOS 17.4 / iPhone 15 Pro"
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  // Foreign keys
+  projectId  String @map("project_id")
+  reporterId String @map("reporter_id")
+  assigneeId String? @map("assignee_id")
+
+  // Relations
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reporter    User           @relation("BugReporter", fields: [reporterId], references: [id])
+  assignee    User?          @relation("BugAssignee", fields: [assigneeId], references: [id])
+  comments    BugComment[]
+  attachments BugAttachment[]
+  notifications Notification[]
+
+  @@index([projectId])
+  @@index([reporterId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([severity])
+  @@map("bugs")
+}
+
+model BugComment {
+  id        String   @id @default(uuid())
+  comment   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Foreign keys
+  bugId  String @map("bug_id")
+  userId String @map("user_id")
+
+  // Relations
+  bug  Bug  @relation(fields: [bugId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([bugId])
+  @@map("bug_comments")
+}
+
+model BugAttachment {
+  id         String   @id @default(uuid())
+  fileUrl    String   @map("file_url")
+  fileName   String   @map("file_name")
+  fileSize   Int      @map("file_size") // bytes
+  mimeType   String   @map("mime_type")
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  // Foreign keys
+  bugId String @map("bug_id")
+
+  // Relations
+  bug Bug @relation(fields: [bugId], references: [id], onDelete: Cascade)
+
+  @@index([bugId])
+  @@map("bug_attachments")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  type      NotificationType
+  title     String
+  body      String           @db.Text
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  // Foreign keys
+  userId String  @map("user_id")
+  bugId  String? @map("bug_id")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bug  Bug? @relation(fields: [bugId], references: [id], onDelete: SetNull)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
