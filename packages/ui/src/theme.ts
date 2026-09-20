@@ -1,3 +1,5 @@
+import { BugSeverity, BugStatus } from '@dhundo/shared';
+
 /**
  * Dhundo Design Tokens — "Clean Slate" Theme
  * A calm, professional palette for daily internal use.
@@ -67,9 +69,37 @@ export const statusColors = {
   REOPENED: { bg: '#FEECEC', text: palette.mutedRed, border: '#F5C5C5' },
 } as const;
 
+export interface ThemeColors {
+  primary: string;
+  primaryHover: string;
+  background: string;
+  surface: string;
+  border: string;
+  textPrimary: string;
+  textSecondary: string;
+  success: string;
+  warning: string;
+  danger: string;
+  info: string;
+  overlay: string;
+  shadow: string;
+}
+
+export interface BadgeColorSet {
+  bg: string;
+  text: string;
+  border: string;
+}
+
+export interface Theme {
+  colors: ThemeColors;
+  severity: Record<BugSeverity, BadgeColorSet>;
+  status: Record<BugStatus, BadgeColorSet>;
+}
+
 // ─── Light Theme ──────────────────────────────────────────────────────────────
 
-export const lightTheme = {
+export const lightTheme: Theme = {
   colors: {
     primary: palette.slateBlue,
     primaryHover: palette.deepSlateBlue,
@@ -87,11 +117,11 @@ export const lightTheme = {
   },
   severity: severityColors,
   status: statusColors,
-} as const;
+};
 
 // ─── Dark Theme ───────────────────────────────────────────────────────────────
 
-export const darkTheme = {
+export const darkTheme: Theme = {
   colors: {
     primary: palette.slateBlueLight,
     primaryHover: palette.slateBlue,
@@ -109,7 +139,7 @@ export const darkTheme = {
   },
   severity: severityColorsDark,
   status: statusColors,
-} as const;
+};
 
 // ─── Typography ───────────────────────────────────────────────────────────────
 
@@ -190,5 +220,3 @@ export const shadows = {
     elevation: 6,
   },
 } as const;
-
-export type Theme = typeof lightTheme;

@@ -1,20 +1,22 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { borderRadius, shadows, spacing } from '../theme';
 
 interface CardProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   elevation?: 'none' | 'sm' | 'md' | 'lg';
   padding?: boolean;
+  testID?: string;
 }
 
-export function Card({ children, style, elevation = 'sm', padding = true }: CardProps) {
+export function Card({ children, style, elevation = 'sm', padding = true, testID }: CardProps) {
   const { theme } = useTheme();
 
   return (
     <View
+      testID={testID}
       style={[
         styles.card,
         { backgroundColor: theme.colors.surface, borderColor: theme.colors.border },

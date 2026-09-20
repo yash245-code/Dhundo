@@ -1,9 +1,39 @@
 import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { BugSeverity, BugStatus, UserRole } from '@prisma/client';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 import { authenticate, requireRole, AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { AppError } from '../middleware/errorHandler';
+
+// ─── File Upload (Multer) ──────────────────────────────────────────────────────
+const uploadDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, uploadDir),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const base = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+    cb(null, `${Date.now()}-${base}${ext}`);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new AppError('Only image attachments are allowed.', 400));
+    }
+  },
+});
 
 export const bugsRouter = Router();
 bugsRouter.use(authenticate);
@@ -38,6 +68,7 @@ const filterSchema = z.object({
   severity: z.nativeEnum(BugSeverity).optional(),
   status: z.nativeEnum(BugStatus).optional(),
   assigneeId: z.string().uuid().optional(),
+  reporterId: z.string().uuid().optional(),
   search: z.string().max(200).optional(),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
@@ -47,7 +78,7 @@ const filterSchema = z.object({
 
 bugsRouter.get('/', async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const { projectId, severity, status, assigneeId, search, page, limit } =
+    const { projectId, severity, status, assigneeId, reporterId, search, page, limit } =
       filterSchema.parse(req.query);
 
     const where = {
@@ -55,6 +86,7 @@ bugsRouter.get('/', async (req: AuthRequest, res: Response, next: NextFunction) 
       ...(severity && { severity }),
       ...(status && { status }),
       ...(assigneeId && { assigneeId }),
+      ...(reporterId && { reporterId }),
       ...(search && {
         OR: [
           { title: { contains: search } },
@@ -142,7 +174,7 @@ bugsRouter.put('/:id', async (req: AuthRequest, res: Response, next: NextFunctio
     // Only reporter, assignee, developer/QA, or admin can update
     const { role, id: userId } = req.user!;
     const canUpdate =
-      [UserRole.ADMIN, UserRole.DEVELOPER, UserRole.QA].includes(role) ||
+      ([UserRole.ADMIN, UserRole.DEVELOPER, UserRole.QA] as UserRole[]).includes(role) ||
       existing.reporterId === userId ||
       existing.assigneeId === userId;
 
@@ -246,3 +278,35 @@ bugsRouter.get('/:id/comments', async (req: AuthRequest, res: Response, next: Ne
     res.json({ success: true, data: comments });
   } catch (err) { next(err); }
 });
+
+// ─── POST /bugs/:id/attachments ──────────────────────────────────────────────
+
+bugsRouter.post(
+  '/:id/attachments',
+  upload.single('file'),
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.file) throw new AppError('No file uploaded.', 400);
+
+      const bug = await prisma.bug.findUnique({ where: { id: req.params.id } });
+      if (!bug) throw new AppError('Bug not found.', 404);
+
+      const fileUrl = `/uploads/${req.file.filename}`;
+
+      const attachment = await prisma.bugAttachment.create({
+        data: {
+          bugId: req.params.id,
+          fileUrl,
+          fileName: req.file.originalname,
+          fileSize: req.file.size,
+          mimeType: req.file.mimetype,
+        },
+      });
+
+      res.status(201).json({ success: true, data: attachment });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+

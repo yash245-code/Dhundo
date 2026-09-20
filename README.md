@@ -99,6 +99,7 @@ pnpm dev --filter=@dhundo/mobile
 | GET | `/api/v1/bugs/:id` | Get bug detail |
 | PUT | `/api/v1/bugs/:id` | Update bug |
 | POST | `/api/v1/bugs/:id/comments` | Add comment |
+| POST | `/api/v1/bugs/:id/attachments` | Upload screenshot/attachment |
 | GET | `/api/v1/users` | List users (Admin) |
 | PATCH | `/api/v1/users/:id/role` | Update user role (Admin) |
 | GET | `/api/v1/notifications` | Get notifications |

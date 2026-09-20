@@ -149,6 +149,7 @@ export interface BugFilters {
   severity?: BugSeverity;
   status?: BugStatus;
   assigneeId?: string;
+  reporterId?: string;
   search?: string;
   page?: number;
   limit?: number;

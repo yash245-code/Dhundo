@@ -2,17 +2,26 @@
 node_modules/
 .pnp
 .pnp.js
+.pnpm-store/
 
 # Build outputs
 dist/
 build/
 .next/
 out/
+web-build/
+
+# Uploads & Media
+uploads/
+apps/backend/uploads/
 
 # Environment files
 .env
-.env.local
-.env.*.local
+.env*.local
+.env.development
+.env.test
+.env.production
+!.env.example
 
 # Turbo
 .turbo/
@@ -28,6 +37,7 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 Desktop.ini
+*.tmp
 
 # Editor
 .vscode/
@@ -38,17 +48,26 @@ Desktop.ini
 *.sln
 *.sw?
 
-# Expo
+# Expo & React Native
 .expo/
 /apps/mobile/.expo/
 /apps/mobile/ios/
 /apps/mobile/android/
+.metro-health-check*
 
-# Prisma
-/apps/backend/prisma/migrations/*.sql
+# React Native for Windows (Phase 2)
+Debug/
+Release/
+x64/
+ARM64/
+*.VC.db
+*.opendb
+*.vcxproj.user
+*.DotSettings.user
 
 # Test coverage
 coverage/
 
 # TypeScript
 *.tsbuildinfo
+

@@ -5,6 +5,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 
+import path from 'path';
+
 import { authRouter } from './routes/auth';
 import { projectsRouter } from './routes/projects';
 import { bugsRouter } from './routes/bugs';
@@ -23,6 +25,9 @@ app.use(
     credentials: true,
   }),
 );
+
+// ─── Static Uploads ───────────────────────────────────────────────────────────
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
 const limiter = rateLimit({

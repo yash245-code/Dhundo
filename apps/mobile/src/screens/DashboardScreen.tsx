@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -7,19 +7,39 @@ import {
   RefreshControl,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { SeverityBadge, StatusBadge, Card, useTheme } from '@dhundo/ui';
-import { bugsApi, useBugsStore, Bug, BugSeverity, BugStatus } from '@dhundo/shared';
+import { bugsApi, useBugsStore, useAuthStore, Bug, BugSeverity, BugStatus } from '@dhundo/shared';
 import { BugStackParamList } from '../navigation/types';
 
 type Nav = NativeStackNavigationProp<BugStackParamList>;
 
+type FilterChipKey = 'ALL' | 'ASSIGNED_TO_ME' | 'MY_REPORTS' | 'CRITICAL' | 'IN_PROGRESS' | 'OPEN';
+
+interface FilterChipItem {
+  key: FilterChipKey;
+  label: string;
+  icon?: string;
+}
+
+const FILTER_CHIPS: FilterChipItem[] = [
+  { key: 'ALL', label: 'All Bugs' },
+  { key: 'ASSIGNED_TO_ME', label: 'Assigned to Me' },
+  { key: 'MY_REPORTS', label: 'My Reports' },
+  { key: 'CRITICAL', label: 'Critical' },
+  { key: 'IN_PROGRESS', label: 'In Progress' },
+  { key: 'OPEN', label: 'Open' },
+];
+
 export function DashboardScreen() {
   const { theme } = useTheme();
   const navigation = useNavigation<Nav>();
+  const { user } = useAuthStore();
   const { bugs, isLoading, filters, pagination, setBugs, setFilters, setLoading } = useBugsStore();
+  const [activeChip, setActiveChip] = useState<FilterChipKey>('ALL');
 
   const loadBugs = useCallback(async () => {
     setLoading(true);
@@ -36,6 +56,30 @@ export function DashboardScreen() {
   useEffect(() => {
     loadBugs();
   }, [loadBugs]);
+
+  const handleSelectChip = (chipKey: FilterChipKey) => {
+    setActiveChip(chipKey);
+    switch (chipKey) {
+      case 'ALL':
+        setFilters({ status: undefined, severity: undefined, assigneeId: undefined, reporterId: undefined });
+        break;
+      case 'ASSIGNED_TO_ME':
+        setFilters({ assigneeId: user?.id, reporterId: undefined, status: undefined, severity: undefined });
+        break;
+      case 'MY_REPORTS':
+        setFilters({ reporterId: user?.id, assigneeId: undefined, status: undefined, severity: undefined });
+        break;
+      case 'CRITICAL':
+        setFilters({ severity: BugSeverity.CRITICAL, status: undefined, assigneeId: undefined, reporterId: undefined });
+        break;
+      case 'IN_PROGRESS':
+        setFilters({ status: BugStatus.IN_PROGRESS, severity: undefined, assigneeId: undefined, reporterId: undefined });
+        break;
+      case 'OPEN':
+        setFilters({ status: BugStatus.OPEN, severity: undefined, assigneeId: undefined, reporterId: undefined });
+        break;
+    }
+  };
 
   const renderBug = ({ item }: { item: Bug }) => (
     <TouchableOpacity
@@ -94,6 +138,45 @@ export function DashboardScreen() {
         />
       </View>
 
+      {/* Filter Chips Bar */}
+      <View style={[styles.chipsWrapper, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsScroll}
+        >
+          {FILTER_CHIPS.map((chip) => {
+            const isActive = activeChip === chip.key;
+            return (
+              <TouchableOpacity
+                key={chip.key}
+                onPress={() => handleSelectChip(chip.key)}
+                style={[
+                  styles.chip,
+                  {
+                    backgroundColor: isActive ? theme.colors.primary : theme.colors.background,
+                    borderColor: isActive ? theme.colors.primary : theme.colors.border,
+                  },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    {
+                      color: isActive ? '#FFFFFF' : theme.colors.textPrimary,
+                      fontWeight: isActive ? '600' : '400',
+                    },
+                  ]}
+                >
+                  {chip.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       <FlatList
         data={bugs}
         keyExtractor={(item) => item.id}
@@ -144,4 +227,21 @@ const styles = StyleSheet.create({
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8, padding: 32 },
   emptyTitle: { fontSize: 18, fontWeight: '600' },
   emptySubtitle: { fontSize: 14, textAlign: 'center' },
+  chipsWrapper: {
+    borderBottomWidth: 1,
+    paddingVertical: 10,
+  },
+  chipsScroll: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  chipText: {
+    fontSize: 13,
+  },
 });

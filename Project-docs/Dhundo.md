@@ -30,12 +30,13 @@ An internal company application that lets any employee, verified via their **off
 ## 4. Core Features
 
 - **Project/App registry** — list of all company-built projects bugs can be filed against
-- **Bug submission** — title, description, steps to reproduce, severity (Low / Medium / High / Critical), screenshots/attachments, environment (OS/device/browser)
-- **Status workflow** — Open → In Progress → In Review → Resolved → Closed (+ Reopened)
+- **Bug submission & Smart Auto-Capture** — title, description, steps to reproduce, severity (Low / Medium / High / Critical), device & OS auto-detection (`Platform` / `Dimensions`), and screenshot/image attachments (`expo-image-picker`)
+- **Status workflow & Triage Actions Bar** — Open → In Progress → In Review → Resolved → Closed (+ Reopened) with 1-tap quick actions and self-assignment (`Assign to Me`)
+- **Interactive In-App Comments** — sticky comment composer and conversation feed per bug
+- **Attachment Gallery** — image thumbnail carousel with full-screen zoom/preview modal
+- **Dashboard & Quick Filters** — segment chips (*All*, *Assigned to Me*, *My Reports*, *Critical*, *In Progress*, *Open*) plus search and pagination
 - **Assignment** — assign bugs to specific developers or teams
-- **Comments & activity log** per bug
-- **Notifications** — in-app + push (mobile) / toast (Windows) on assignment, comments, or status change
-- **Dashboard** — filter by project, severity, status, assignee; basic analytics (open vs resolved, avg. resolution time)
+- **Notifications** — in-app notifications on assignment, comments, or status changes
 - **Search** — full-text search across bug titles/descriptions
 
 ---
