@@ -12,6 +12,7 @@ import { ProjectsScreen } from '../screens/ProjectsScreen';
 import { NewBugScreen } from '../screens/NewBugScreen';
 import { NotificationsScreen } from '../screens/NotificationsScreen';
 import { ProfileScreen } from '../screens/ProfileScreen';
+import { BugDetailScreen } from '../screens/BugDetailScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -72,7 +73,10 @@ export function RootNavigator({ isAuthenticated }: Props) {
       }}
     >
       {isAuthenticated ? (
-        <Stack.Screen name="Main" component={MainTabs as any} />
+        <>
+          <Stack.Screen name="Main" component={MainTabs as any} />
+          <Stack.Screen name="BugDetail" component={BugDetailScreen} />
+        </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 56,
+    paddingTop: Platform.OS === 'web' ? 16 : 56,
     paddingBottom: 12,
     borderBottomWidth: 1,
     flexDirection: 'row',

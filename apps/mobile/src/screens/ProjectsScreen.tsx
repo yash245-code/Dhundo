@@ -6,6 +6,7 @@ import {
   StyleSheet,
   RefreshControl,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
 import { Card, useTheme } from '@dhundo/ui';
 import { projectsApi, useProjectsStore, Project } from '@dhundo/shared';
@@ -69,7 +70,7 @@ export function ProjectsScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 12, borderBottomWidth: 1 },
+  header: { paddingHorizontal: 20, paddingTop: Platform.OS === 'web' ? 16 : 56, paddingBottom: 12, borderBottomWidth: 1 },
   title: { fontSize: 24, fontWeight: '700' },
   list: { padding: 16, gap: 12 },
   card: { marginBottom: 0 },

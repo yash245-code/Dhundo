@@ -91,11 +91,21 @@ export function NewBugScreen() {
         const type = match ? `image/${match[1]}` : `image/jpeg`;
 
         const formData = new FormData();
-        formData.append('file', {
-          uri,
-          name: filename,
-          type,
-        } as any);
+        if (Platform.OS === 'web') {
+          if ((selectedImage as any).file) {
+            formData.append('file', (selectedImage as any).file, filename);
+          } else {
+            const blobRes = await fetch(uri);
+            const blob = await blobRes.blob();
+            formData.append('file', blob, filename);
+          }
+        } else {
+          formData.append('file', {
+            uri,
+            name: filename,
+            type,
+          } as any);
+        }
 
         try {
           await bugsApi.uploadAttachment(createdBug.id, formData);
@@ -285,7 +295,7 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 12 },
   successTitle: { fontSize: 22, fontWeight: '700' },
   successSub: { fontSize: 14, textAlign: 'center' },
-  container: { padding: 20, paddingTop: 56, gap: 16 },
+  container: { padding: 20, paddingTop: Platform.OS === 'web' ? 24 : 56, gap: 16 },
   title: { fontSize: 22, fontWeight: '700', marginBottom: 4 },
   field: { gap: 8 },
   labelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

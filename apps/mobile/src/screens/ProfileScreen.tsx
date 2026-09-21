@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Card, Button, useTheme } from '@dhundo/ui';
 import { useAuthStore } from '@dhundo/shared';
 
@@ -63,7 +63,7 @@ function InfoRow({ label, value, theme }: { label: string; value: string; theme:
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingTop: 56, paddingBottom: 12, borderBottomWidth: 1 },
+  header: { paddingHorizontal: 20, paddingTop: Platform.OS === 'web' ? 16 : 56, paddingBottom: 12, borderBottomWidth: 1 },
   title: { fontSize: 24, fontWeight: '700' },
   content: { alignItems: 'center', padding: 24, gap: 12 },
   avatarContainer: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' },

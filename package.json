@@ -5,7 +5,11 @@
   "description": "Internal bug tracking system — cross-platform (iOS, Android, Windows)",
   "scripts": {
     "dev": "turbo run dev",
+    "dev:web": "pnpm --filter @dhundo/mobile web",
+    "dev:backend": "pnpm --filter @dhundo/backend dev",
+    "web": "pnpm --filter @dhundo/mobile web",
     "build": "turbo run build",
+    "build:web": "pnpm --filter @dhundo/mobile build:web",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
     "type-check": "turbo run type-check",

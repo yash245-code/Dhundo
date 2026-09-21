@@ -10,6 +10,7 @@ import {
   Image,
   Modal,
   Alert,
+  Platform,
 } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { SeverityBadge, StatusBadge, Card, Button, useTheme } from '@dhundo/ui';
@@ -383,7 +384,7 @@ export function BugDetailScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  container: { padding: 16, gap: 12, paddingTop: 56 },
+  container: { padding: 16, gap: 12, paddingTop: Platform.OS === 'web' ? 20 : 56 },
   section: { borderRadius: 12, borderWidth: 1, padding: 16, gap: 8 },
   badgeRow: { flexDirection: 'row', gap: 8, marginBottom: 4 },
   title: { fontSize: 18, fontWeight: '700', lineHeight: 26 },

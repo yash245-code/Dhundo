@@ -2,6 +2,7 @@ export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Main: undefined;
+  BugDetail: { bugId: string };
 };
 
 export type MainTabParamList = {
