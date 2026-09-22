@@ -18,8 +18,10 @@ const SEVERITY_LABELS: Record<BugSeverity, string> = {
 };
 
 export function SeverityBadge({ severity }: SeverityBadgeProps) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const colors = theme.severity[severity];
+
+  const dotColor = colors.text;
 
   return (
     <View
@@ -29,9 +31,18 @@ export function SeverityBadge({ severity }: SeverityBadgeProps) {
           backgroundColor: colors.bg,
           borderColor: colors.border,
         },
+        isDark && {
+          shadowColor: colors.text,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+        },
       ]}
     >
-      <Text style={[styles.badgeText, { color: colors.text }]}>{SEVERITY_LABELS[severity]}</Text>
+      <View style={[styles.dot, { backgroundColor: dotColor }]} />
+      <Text style={[styles.badgeText, { color: colors.text }]}>
+        {SEVERITY_LABELS[severity].toUpperCase()}
+      </Text>
     </View>
   );
 }
@@ -52,7 +63,7 @@ const STATUS_LABELS: Record<BugStatus, string> = {
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const colors = theme.status[status];
 
   return (
@@ -63,24 +74,41 @@ export function StatusBadge({ status }: StatusBadgeProps) {
           backgroundColor: colors.bg,
           borderColor: colors.border,
         },
+        isDark && {
+          shadowColor: colors.text,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        },
       ]}
     >
-      <Text style={[styles.badgeText, { color: colors.text }]}>{STATUS_LABELS[status]}</Text>
+      <View style={[styles.dot, { backgroundColor: colors.text }]} />
+      <Text style={[styles.badgeText, { color: colors.text }]}>
+        {STATUS_LABELS[status].toUpperCase()}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   badge: {
-    paddingHorizontal: spacing[2],
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: borderRadius.sm,
     borderWidth: 1,
     alignSelf: 'flex-start',
   },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
   badgeText: {
-    fontSize: typography.fontSizes.xs,
-    fontWeight: typography.fontWeights.semibold,
-    letterSpacing: 0.3,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.6,
   },
 });

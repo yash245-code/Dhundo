@@ -52,10 +52,10 @@ export const severityColors = {
 } as const;
 
 export const severityColorsDark = {
-  LOW: { bg: '#1A3028', text: '#5EC98A', border: '#2A5040' },
-  MEDIUM: { bg: '#302610', text: '#F0BA50', border: '#503C18' },
-  HIGH: { bg: '#301818', text: '#E86B6B', border: '#502020' },
-  CRITICAL: { bg: '#401010', text: '#F07070', border: '#601818' },
+  LOW: { bg: 'rgba(0, 255, 157, 0.12)', text: '#00FF9D', border: 'rgba(0, 255, 157, 0.35)' },
+  MEDIUM: { bg: 'rgba(255, 184, 0, 0.12)', text: '#FFB800', border: 'rgba(255, 184, 0, 0.35)' },
+  HIGH: { bg: 'rgba(255, 128, 0, 0.14)', text: '#FF8800', border: 'rgba(255, 128, 0, 0.4)' },
+  CRITICAL: { bg: 'rgba(255, 51, 102, 0.18)', text: '#FF3366', border: 'rgba(255, 51, 102, 0.5)' },
 } as const;
 
 // ─── Status Colors ────────────────────────────────────────────────────────────
@@ -69,18 +69,31 @@ export const statusColors = {
   REOPENED: { bg: '#FEECEC', text: palette.mutedRed, border: '#F5C5C5' },
 } as const;
 
+export const statusColorsDark = {
+  OPEN: { bg: 'rgba(0, 240, 255, 0.12)', text: '#00F0FF', border: 'rgba(0, 240, 255, 0.35)' },
+  IN_PROGRESS: { bg: 'rgba(56, 189, 248, 0.12)', text: '#38BDF8', border: 'rgba(56, 189, 248, 0.35)' },
+  IN_REVIEW: { bg: 'rgba(255, 184, 0, 0.12)', text: '#FFB800', border: 'rgba(255, 184, 0, 0.35)' },
+  RESOLVED: { bg: 'rgba(0, 255, 157, 0.12)', text: '#00FF9D', border: 'rgba(0, 255, 157, 0.35)' },
+  CLOSED: { bg: 'rgba(148, 163, 184, 0.12)', text: '#94A3B8', border: 'rgba(148, 163, 184, 0.35)' },
+  REOPENED: { bg: 'rgba(255, 51, 102, 0.15)', text: '#FF3366', border: 'rgba(255, 51, 102, 0.45)' },
+} as const;
+
 export interface ThemeColors {
   primary: string;
   primaryHover: string;
   background: string;
   surface: string;
+  surfaceElevated?: string;
   border: string;
+  borderGlow?: string;
   textPrimary: string;
   textSecondary: string;
+  textMuted?: string;
   success: string;
   warning: string;
   danger: string;
   info: string;
+  accent?: string;
   overlay: string;
   shadow: string;
 }
@@ -92,6 +105,7 @@ export interface BadgeColorSet {
 }
 
 export interface Theme {
+  isDark: boolean;
   colors: ThemeColors;
   severity: Record<BugSeverity, BadgeColorSet>;
   status: Record<BugStatus, BadgeColorSet>;
@@ -100,18 +114,23 @@ export interface Theme {
 // ─── Light Theme ──────────────────────────────────────────────────────────────
 
 export const lightTheme: Theme = {
+  isDark: false,
   colors: {
     primary: palette.slateBlue,
     primaryHover: palette.deepSlateBlue,
     background: palette.offWhite,
     surface: palette.white,
+    surfaceElevated: '#FFFFFF',
     border: palette.coolGray,
+    borderGlow: 'rgba(58, 91, 160, 0.2)',
     textPrimary: palette.charcoal,
     textSecondary: palette.slateGray,
+    textMuted: '#9AA0AC',
     success: palette.mutedGreen,
     warning: palette.amber,
     danger: palette.mutedRed,
     info: palette.softTeal,
+    accent: '#6366F1',
     overlay: 'rgba(31, 36, 48, 0.5)',
     shadow: 'rgba(31, 36, 48, 0.08)',
   },
@@ -119,26 +138,31 @@ export const lightTheme: Theme = {
   status: statusColors,
 };
 
-// ─── Dark Theme ───────────────────────────────────────────────────────────────
+// ─── Dark Theme (Futuristic Clean Black Cyberpunk-Executive) ──────────────────
 
 export const darkTheme: Theme = {
+  isDark: true,
   colors: {
-    primary: palette.slateBlueLight,
-    primaryHover: palette.slateBlue,
-    background: palette.darkBg,
-    surface: palette.darkSurface,
-    border: palette.darkBorder,
-    textPrimary: palette.lightText,
-    textSecondary: palette.lightTextSecondary,
-    success: '#5EC98A',
-    warning: '#F0BA50',
-    danger: '#E86B6B',
-    info: '#4DC8C8',
-    overlay: 'rgba(0, 0, 0, 0.6)',
-    shadow: 'rgba(0, 0, 0, 0.3)',
+    primary: '#00F0FF', // Electric Neon Cyan
+    primaryHover: '#00D4E2',
+    background: '#030508', // Pure Obsidian Cyber Black
+    surface: '#0A0D15', // Deep Space Glassmorphic Surface
+    surfaceElevated: '#111624', // Elevated Card Surface
+    border: '#1A2336', // Hairline Cyber Border
+    borderGlow: 'rgba(0, 240, 255, 0.3)', // Neon Edge Luminescence
+    textPrimary: '#F8FAFC', // Ice White
+    textSecondary: '#94A3B8', // Cool Cyber Slate
+    textMuted: '#64748B', // Muted Telemetry Grey
+    success: '#00FF9D', // Matrix Emerald
+    warning: '#FFB800', // Solar Amber
+    danger: '#FF3366', // Laser Crimson
+    info: '#38BDF8', // Electric Blue
+    accent: '#818CF8', // Quantum Violet
+    overlay: 'rgba(0, 0, 0, 0.85)',
+    shadow: 'rgba(0, 0, 0, 0.8)',
   },
   severity: severityColorsDark,
-  status: statusColors,
+  status: statusColorsDark,
 };
 
 // ─── Typography ───────────────────────────────────────────────────────────────

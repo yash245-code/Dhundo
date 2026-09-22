@@ -22,13 +22,13 @@ function AppContent() {
   }, [accessToken, refreshToken]);
 
   return (
-    <View style={[styles.rootContainer, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.rootContainer, { backgroundColor: isDark ? '#000000' : theme.colors.background }]}>
       <View
         style={[
           styles.webShell,
           {
             backgroundColor: theme.colors.background,
-            borderColor: theme.colors.border,
+            borderColor: isDark ? '#162032' : theme.colors.border,
           },
         ]}
       >
@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
       ? {
           borderLeftWidth: 1,
           borderRightWidth: 1,
+          boxShadow: '0 0 50px rgba(0, 240, 255, 0.03)',
         }
       : {}),
   },

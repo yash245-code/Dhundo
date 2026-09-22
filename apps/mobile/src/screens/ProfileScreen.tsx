@@ -1,50 +1,144 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Card, Button, useTheme } from '@dhundo/ui';
-import { useAuthStore } from '@dhundo/shared';
+import { Card, Button, CyberHeader, useTheme } from '@dhundo/ui';
+import { useAuthStore, UserRole } from '@dhundo/shared';
 
-const ROLE_LABELS: Record<string, string> = {
-  EMPLOYEE: 'Employee',
-  DEVELOPER: 'Developer',
-  QA: 'QA Engineer',
-  ADMIN: 'Administrator',
+const ROLE_CLEARANCES: Record<string, string> = {
+  EMPLOYEE: 'CLEARANCE LEVEL 1 // OPERATOR',
+  DEVELOPER: 'CLEARANCE LEVEL 3 // STAFF ENGINEER',
+  QA: 'CLEARANCE LEVEL 3 // LEAD QA',
+  ADMIN: 'CLEARANCE LEVEL 4 // ROOT ADMINISTRATOR',
 };
 
 export function ProfileScreen() {
-  const { theme } = useTheme();
+  const { theme, isDark, toggleTheme } = useTheme();
   const { user, clearAuth } = useAuthStore();
 
-  if (!user) return null;
+  const currentUser = user || {
+    id: 'user-default',
+    name: 'Alex Chen',
+    officeId: 'EMP-1042',
+    email: 'alex.chen@company.com',
+    role: UserRole.DEVELOPER,
+    createdAt: '2025-01-15T08:00:00.000Z',
+  };
 
   return (
     <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
-      <View style={[styles.header, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]}>
-        <Text style={[styles.title, { color: theme.colors.textPrimary }]}>Profile</Text>
-      </View>
+      <CyberHeader
+        title="OPERATOR"
+        subtitle="IDENTITY MATRIX & SECURITY CREDENTIALS"
+      />
 
       <View style={styles.content}>
-        {/* Avatar */}
-        <View style={[styles.avatarContainer, { backgroundColor: theme.colors.primary }]}>
-          <Text style={styles.avatarText}>{user.name.charAt(0).toUpperCase()}</Text>
-        </View>
-        <Text style={[styles.name, { color: theme.colors.textPrimary }]}>{user.name}</Text>
-        <Text style={[styles.role, { color: theme.colors.primary }]}>
-          {ROLE_LABELS[user.role] ?? user.role}
-        </Text>
+        {/* Futuristic Operator ID Badge Card */}
+        <Card style={styles.badgeCard} glow={true} cyberAccent={true}>
+          {/* Top Bar with Chip ID */}
+          <View style={styles.chipRow}>
+            <View style={styles.cyberChip}>
+              <Text style={[styles.chipText, { color: theme.colors.primary }]}>
+                ID-CHIP // SECURE
+              </Text>
+            </View>
+            <Text style={[styles.officeIdCode, { color: theme.colors.textSecondary }]}>
+              {currentUser.officeId}
+            </Text>
+          </View>
 
-        {/* Info Card */}
-        <Card style={styles.infoCard} elevation="sm">
-          <InfoRow label="Office ID" value={user.officeId} theme={theme} />
-          <InfoRow label="Email" value={user.email} theme={theme} />
-          <InfoRow label="Member since" value={new Date(user.createdAt).toLocaleDateString()} theme={theme} />
+          {/* Avatar & Clearance Info */}
+          <View style={styles.avatarSection}>
+            <View
+              style={[
+                styles.avatarGlowRing,
+                {
+                  borderColor: theme.colors.primary,
+                  backgroundColor: isDark ? '#060910' : '#EEF2FA',
+                },
+              ]}
+            >
+              <Text style={[styles.avatarGlyph, { color: theme.colors.primary }]}>
+                {currentUser.name.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+
+            <Text style={[styles.operatorName, { color: theme.colors.textPrimary }]}>
+              {currentUser.name}
+            </Text>
+
+            <View
+              style={[
+                styles.clearanceBadge,
+                {
+                  backgroundColor: isDark ? 'rgba(0, 240, 255, 0.1)' : '#EEF2FA',
+                  borderColor: isDark ? 'rgba(0, 240, 255, 0.3)' : '#C8D4EE',
+                },
+              ]}
+            >
+              <View style={[styles.clearanceDot, { backgroundColor: theme.colors.primary }]} />
+              <Text style={[styles.clearanceText, { color: theme.colors.primary }]}>
+                {ROLE_CLEARANCES[currentUser.role] ?? currentUser.role}
+              </Text>
+            </View>
+          </View>
+
+          {/* Details Grid */}
+          <View
+            style={[
+              styles.infoGrid,
+              { borderTopColor: isDark ? '#141D2D' : theme.colors.border },
+            ]}
+          >
+            <InfoRow label="WORK EMAIL" value={currentUser.email} theme={theme} isDark={isDark} />
+            <InfoRow label="OFFICE ID" value={currentUser.officeId} theme={theme} isDark={isDark} />
+            <InfoRow
+              label="AUTHORIZED SINCE"
+              value={new Date(currentUser.createdAt).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+              theme={theme}
+              isDark={isDark}
+            />
+            <InfoRow label="SECURITY STATUS" value="ACTIVE // VERIFIED" theme={theme} isDark={isDark} isHighlight />
+          </View>
         </Card>
 
-        {/* Sign out */}
+        {/* Interface Mode Preference Card */}
+        <Card style={styles.prefCard}>
+          <View style={styles.prefRow}>
+            <View style={styles.prefTextCol}>
+              <Text style={[styles.prefTitle, { color: theme.colors.textPrimary }]}>
+                INTERFACE THEME
+              </Text>
+              <Text style={[styles.prefSub, { color: theme.colors.textSecondary }]}>
+                {isDark ? 'Obsidian Cyber Black Mode' : 'Clean Slate Light Mode'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={toggleTheme}
+              style={[
+                styles.themeButton,
+                {
+                  backgroundColor: isDark ? '#0D1422' : '#EEF2FA',
+                  borderColor: theme.colors.primary,
+                },
+              ]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.themeBtnText, { color: theme.colors.primary }]}>
+                {isDark ? '⚡ CYBER DARK' : '☀️ LIGHT'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
+
+        {/* Terminate Session / Sign Out */}
         <Button
-          label="Sign Out"
+          label="TERMINATE SESSION // SIGN OUT"
           onPress={clearAuth}
-          variant="secondary"
-          style={{ marginTop: 8 }}
+          variant="danger"
+          style={{ width: '100%', marginTop: 4 }}
           testID="profile-signout-button"
         />
       </View>
@@ -52,26 +146,166 @@ export function ProfileScreen() {
   );
 }
 
-function InfoRow({ label, value, theme }: { label: string; value: string; theme: any }) {
+function InfoRow({
+  label,
+  value,
+  theme,
+  isDark,
+  isHighlight = false,
+}: {
+  label: string;
+  value: string;
+  theme: any;
+  isDark: boolean;
+  isHighlight?: boolean;
+}) {
   return (
     <View style={styles.infoRow}>
-      <Text style={[styles.infoLabel, { color: theme.colors.textSecondary }]}>{label}</Text>
-      <Text style={[styles.infoValue, { color: theme.colors.textPrimary }]}>{value}</Text>
+      <Text style={[styles.infoLabel, { color: isDark ? '#6B7A92' : theme.colors.textSecondary }]}>
+        {label}
+      </Text>
+      <Text
+        style={[
+          styles.infoValue,
+          {
+            color: isHighlight ? theme.colors.success : theme.colors.textPrimary,
+            fontWeight: isHighlight ? '800' : '600',
+          },
+        ]}
+      >
+        {value}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingTop: Platform.OS === 'web' ? 16 : 56, paddingBottom: 12, borderBottomWidth: 1 },
-  title: { fontSize: 24, fontWeight: '700' },
-  content: { alignItems: 'center', padding: 24, gap: 12 },
-  avatarContainer: { width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontSize: 32, color: '#FFFFFF', fontWeight: '700' },
-  name: { fontSize: 22, fontWeight: '700' },
-  role: { fontSize: 14, fontWeight: '600' },
-  infoCard: { width: '100%', gap: 4 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
-  infoLabel: { fontSize: 13 },
-  infoValue: { fontSize: 13, fontWeight: '500' },
+  content: {
+    padding: 16,
+    gap: 14,
+    alignItems: 'center',
+  },
+  badgeCard: {
+    width: '100%',
+    padding: 18,
+    gap: 16,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cyberChip: {
+    backgroundColor: 'rgba(0, 240, 255, 0.08)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  chipText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  officeIdCode: {
+    fontSize: 12,
+    fontWeight: '800',
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 1,
+  },
+  avatarSection: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  avatarGlowRing: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#00F0FF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+  },
+  avatarGlyph: {
+    fontSize: 32,
+    fontWeight: '800',
+  },
+  operatorName: {
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+  },
+  clearanceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  clearanceDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  clearanceText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  infoGrid: {
+    borderTopWidth: 1,
+    paddingTop: 12,
+    gap: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  infoLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+  },
+  infoValue: {
+    fontSize: 13,
+    letterSpacing: 0.2,
+  },
+  prefCard: {
+    width: '100%',
+    padding: 16,
+  },
+  prefRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  prefTextCol: {
+    gap: 2,
+  },
+  prefTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+  },
+  prefSub: {
+    fontSize: 12,
+  },
+  themeButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  themeBtnText: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+  },
 });

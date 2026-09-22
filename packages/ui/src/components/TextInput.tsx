@@ -28,7 +28,7 @@ export function TextInput({
   rightIcon,
   ...props
 }: TextInputProps) {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
   const borderColor = error
@@ -40,15 +40,32 @@ export function TextInput({
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
-        <Text style={[styles.label, { color: theme.colors.textPrimary }]}>{label}</Text>
+        <Text
+          style={[
+            styles.label,
+            {
+              color: isFocused ? theme.colors.primary : theme.colors.textPrimary,
+              letterSpacing: 0.2,
+            },
+          ]}
+        >
+          {label}
+        </Text>
       )}
       <View
         style={[
           styles.inputWrapper,
           {
             borderColor,
-            backgroundColor: theme.colors.surface,
+            backgroundColor: isDark ? (theme.colors.surfaceElevated || '#0B0F19') : theme.colors.surface,
             borderWidth: isFocused ? 1.5 : 1,
+          },
+          isDark && isFocused && {
+            shadowColor: theme.colors.primary,
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.35,
+            shadowRadius: 8,
+            elevation: 3,
           },
         ]}
       >
@@ -62,7 +79,7 @@ export function TextInput({
               paddingRight: rightIcon ? 0 : spacing[3],
             },
           ]}
-          placeholderTextColor={theme.colors.textSecondary}
+          placeholderTextColor={isDark ? '#526078' : theme.colors.textSecondary}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           {...props}
